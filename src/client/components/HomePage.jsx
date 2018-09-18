@@ -1,5 +1,14 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import App from './App';
+import storeFactory from '../redux/store/storeFactory';
 
-const HomePage = () => <h1>Hello!</h1>;
+const store = storeFactory();
+
+const HomePage = () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
 
 export default HomePage;
