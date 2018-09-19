@@ -1,0 +1,50 @@
+// Bootstrap overrides for this template
+.text-primary {
+  color: $theme-primary !important;
+}
+
+.no-gutter > [class*='col-'] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.btn-default {
+  @include button-variant($gray-darker, white, white);
+}
+
+.btn-gray {
+  @include button-variant(white, $gray, $gray);
+}
+
+.btn-yellow {
+  @include button-variant (#222, $yellow, $yellow);
+}
+.btn-primary {
+  @include button-variant(white, $button-primary, $button-primary);
+}
+
+.btn {
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 300px;
+  // @include sans-serif-font;
+}
+
+.btn-xl {
+  padding: 15px 30px;
+}
+
+.rounded {
+  border-radius: 1rem!important;
+}
+
+.pagination .page-item:first-child .page-link {
+  border-top-left-radius: 0.75rem;
+  border-bottom-left-radius: 0.75rem;
+}
+
+.pagination .page-item:last-child .page-link { 
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}

@@ -1,27 +1,57 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import C from '../constants';
-import SearchAddressForm from './SearchAddressForm/SearchAddressForm';
-import Suggestion from './Suggestion/Suggestion';
+import FormContainer from './containers/FormContainer';
 
-class App extends React.component {
+class App extends React.Component {
   state = {
-    query: '',
-    suggestions: []
+    suggestions: [],
+    currentFocus: 0,
+    query: ''
   };
 
   getSuggestions = query => {
-    this.postData({ query: this.queryInput.value, count: 6 })
+    this.postData({ query, count: C.MAX_SUGGESTIONS })
       .then(result => result.suggestions.map(suggestion => suggestion.value))
-      .then(suggestions => this.setState({ suggestions, query }))
+      .then(suggestions => this.setState({ suggestions }))
       .catch(error => console.error(error));
   };
 
-  handleInputChange = () => {
-    if (this.queryInput.value.length > 2) {
-      this.getSuggestions(this.queryInput.value);
+  handleInputChange = e => {
+    if (e.target.value.length > 2) {
+      const suggestions = this.getSuggestions(e.target.value);
+      const newSuggestions = [e.target.value, ...suggestions];
+      console.log(newSuggestions);
+      const nextState = {
+        ...this.state,
+        suggestions: newSuggestions,
+        query: e.target.value
+      };
+      this.setState(nextState);
     }
+  };
+
+  handleKeyDown = e => {
+    let { currentFocus } = this.state;
+    switch (e.keyCode) {
+      case 38:
+        console.log('UP');
+        currentFocus = currentFocus && currentFocus - 1;
+        e.preventDefault();
+        break;
+      case 40:
+        console.log('DOWN');
+        currentFocus = currentFocus + 1 < C.MAX_SUGGESTIONS ? currentFocus + 1 : currentFocus;
+        e.preventDefault();
+        break;
+      default:
+    }
+    const nextState = {
+      ...this.state,
+      currentFocus,
+      query: this.state.suggestions[currentFocus]
+    };
+    this.setState(nextState);
   };
 
   postData = (data = {}) =>
@@ -42,26 +72,20 @@ class App extends React.component {
     }).then(response => response.json()); // parses response to JSON
 
   render() {
-    const { handleInputChange } = this;
-    const { suggestions } = this.state;
+    const { handleInputChange, handleKeyDown } = this;
+    const { suggestions, currentFocus, query } = this.state;
     return (
       <div className="app">
-        <SearchAddressForm onChange={handleInputChange} />
-        <ul>
-          {suggestions.map(item => (
-            <Suggestion title={item} />
-          ))}
-        </ul>
+        <FormContainer
+          onInput={handleInputChange}
+          handleKeyDown={handleKeyDown}
+          suggestions={suggestions}
+          currentFocus={currentFocus}
+          query={query}
+        />
       </div>
     );
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    query: state.query,
-    suggestions: state.suggestions
-  };
-}
-
-export default connect(mapStateToProps)(App);
+export default App;
