@@ -12,9 +12,12 @@ class App extends React.Component {
   };
 
   getSuggestions = query =>
-    this.postData({ query, count: C.MAX_SUGGESTIONS }).then(result =>
-      result.suggestions.map(suggestion => suggestion.value)
-    );
+    fetch(`http://geoapisuggest/requests?query=${query}`)
+      .then(response => response.json()) // parses response to JSON
+      .catch(error => console.error(error));
+  // this.postData({ query, count: C.MAX_SUGGESTIONS }).then(result =>
+  //   result.suggestions.map(suggestion => suggestion.value)
+  // );
 
   handleInputChange = e => {
     const newQuery = e.target.value;
@@ -43,7 +46,6 @@ class App extends React.Component {
 
     switch (e.keyCode) {
       case 38: // UP key handler
-        console.log('UP');
         nextFocus = currentFocus > -1 ? currentFocus - 1 : currentFocus;
         if (nextFocus === -1) {
           nextSelectedValue = query;
@@ -53,7 +55,6 @@ class App extends React.Component {
         e.preventDefault();
         break;
       case 40: // DOWN key handler
-        console.log('DOWN');
         nextFocus = currentFocus + 1 < suggestions.length ? currentFocus + 1 : currentFocus;
         nextSelectedValue = suggestions[nextFocus];
         e.preventDefault();
@@ -91,7 +92,6 @@ class App extends React.Component {
       body: JSON.stringify(data) // body data type must match "Content-Type" header
     })
       .then(response => response.json()) // parses response to JSON
-      // .then(response => response.json()) // parses response to JSON
       .catch(error => console.error(error));
 
   render() {
