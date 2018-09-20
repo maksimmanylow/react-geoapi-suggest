@@ -3,7 +3,7 @@ import Suggestion from '../Suggestion';
 import Input from '../Input';
 
 const FormContainer = ({
-  onInput = f => f,
+  handleInputChange = f => f,
   handleKeyDown = f => f,
   suggestions,
   currentFocus,
@@ -11,7 +11,7 @@ const FormContainer = ({
 }) => (
   <form onSubmit={e => e.preventDefault()}>
     <div className="autocomplete">
-      <Input type="text" onChange={onInput} onKeyDown={handleKeyDown} value={query} />
+      <Input type="text" onChange={handleInputChange} onKeyDown={handleKeyDown} value={query} />
       <div className="autocomplete-items">
         {suggestions.map((item, key) => (
           <Suggestion title={item} key={key} isActive={currentFocus === key} />

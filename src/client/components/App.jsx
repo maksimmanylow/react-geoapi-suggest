@@ -5,51 +5,71 @@ import FormContainer from './containers/FormContainer';
 
 class App extends React.Component {
   state = {
+    query: '',
+    selectedValue: '',
     suggestions: [],
-    currentFocus: 0,
-    query: ''
+    currentFocus: -1
   };
 
-  getSuggestions = query => {
-    this.postData({ query, count: C.MAX_SUGGESTIONS })
-      .then(result => result.suggestions.map(suggestion => suggestion.value))
-      .then(suggestions => this.setState({ suggestions }))
-      .catch(error => console.error(error));
-  };
+  getSuggestions = query =>
+    this.postData({ query, count: C.MAX_SUGGESTIONS }).then(result =>
+      result.suggestions.map(suggestion => suggestion.value)
+    );
 
   handleInputChange = e => {
-    if (e.target.value.length > 2) {
-      const suggestions = this.getSuggestions(e.target.value);
-      const newSuggestions = [e.target.value, ...suggestions];
-      console.log(newSuggestions);
-      const nextState = {
-        ...this.state,
-        suggestions: newSuggestions,
-        query: e.target.value
-      };
+    const newQuery = e.target.value;
+    const nextState = {
+      query: newQuery,
+      selectedValue: newQuery,
+      currentFocus: -1
+    };
+    if (newQuery.length > 2) {
+      this.getSuggestions(newQuery).then(nextSuggestions => {
+        nextState.suggestions = nextSuggestions;
+        this.setState(nextState);
+      });
+    } else {
+      nextState.suggestions = [];
       this.setState(nextState);
     }
   };
 
   handleKeyDown = e => {
-    let { currentFocus } = this.state;
+    const { query, suggestions, currentFocus, selectedValue } = this.state;
+    let nextFocus = currentFocus;
+    let nextSelectedValue = selectedValue;
+
+    if (!suggestions.length) return;
+
     switch (e.keyCode) {
-      case 38:
+      case 38: // UP key handler
         console.log('UP');
-        currentFocus = currentFocus && currentFocus - 1;
+        nextFocus = currentFocus > -1 ? currentFocus - 1 : currentFocus;
+        if (nextFocus === -1) {
+          nextSelectedValue = query;
+        } else {
+          nextSelectedValue = suggestions[nextFocus];
+        }
         e.preventDefault();
         break;
-      case 40:
+      case 40: // DOWN key handler
         console.log('DOWN');
-        currentFocus = currentFocus + 1 < C.MAX_SUGGESTIONS ? currentFocus + 1 : currentFocus;
+        nextFocus = currentFocus + 1 < suggestions.length ? currentFocus + 1 : currentFocus;
+        nextSelectedValue = suggestions[nextFocus];
         e.preventDefault();
         break;
+      // case 27: // ESCAPE key handler
+      //   console.log('ESCAPE');
+      //   currentFocus = 0;
+      //   this.hideSuggestions();
+      //   e.preventDefault();
+      //   break;
       default:
     }
     const nextState = {
       ...this.state,
-      currentFocus,
-      query: this.state.suggestions[currentFocus]
+      currentFocus: nextFocus,
+      selectedValue: nextSelectedValue
     };
     this.setState(nextState);
   };
@@ -69,19 +89,22 @@ class App extends React.Component {
       redirect: 'follow', // manual, *follow, error
       referrer: 'no-referrer', // no-referrer, *client
       body: JSON.stringify(data) // body data type must match "Content-Type" header
-    }).then(response => response.json()); // parses response to JSON
+    })
+      .then(response => response.json()) // parses response to JSON
+      // .then(response => response.json()) // parses response to JSON
+      .catch(error => console.error(error));
 
   render() {
     const { handleInputChange, handleKeyDown } = this;
-    const { suggestions, currentFocus, query } = this.state;
+    const { suggestions, currentFocus, selectedValue } = this.state;
     return (
       <div className="app">
         <FormContainer
-          onInput={handleInputChange}
+          handleInputChange={handleInputChange}
           handleKeyDown={handleKeyDown}
           suggestions={suggestions}
           currentFocus={currentFocus}
-          query={query}
+          query={selectedValue}
         />
       </div>
     );

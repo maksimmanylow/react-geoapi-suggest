@@ -11,7 +11,6 @@ const Input = props => (
       name={props.name}
       type={props.type}
       value={props.value}
-      onChange={props.handleChange}
       placeholder={props.placeholder}
       onChange={props.onChange}
       onKeyDown={props.onKeyDown}
