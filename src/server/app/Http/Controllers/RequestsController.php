@@ -9,16 +9,16 @@ use App\Response as ResponseModel;
 class RequestsController extends Controller
 {
     public function index(Request $request) {
-      // $RequestModel = RequestModel::create($request->all);
       $query = $request->query('query');
+      $RequestModel = RequestModel::create(['query' => $query]);
       $suggestions = $this->getSuggestions($query);
 
-      // foreach($suggestions as $suggestion) {
-      //   ResponseModel::create([
-      //     'suggestion' => $suggestion,
-      //     'request_id' => $RequestModel->id,
-      //   ]);
-      // }
+      foreach($suggestions as $suggestion) {
+        ResponseModel::create([
+          'suggestion' => $suggestion,
+          'request_id' => $RequestModel->id,
+        ]);
+      }
       
 
       return response()->json($suggestions);

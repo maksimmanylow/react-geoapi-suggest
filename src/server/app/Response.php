@@ -11,5 +11,5 @@ class Response extends Model
      *
      * @var array
      */
-    protected $fillable = ['suggestion'];
+    protected $fillable = ['suggestion', 'request_id'];
 }
