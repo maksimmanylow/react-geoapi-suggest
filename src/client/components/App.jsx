@@ -75,6 +75,19 @@ class App extends React.Component {
     this.setState(nextState);
   };
 
+  handleClick = key => {
+    const { suggestions } = this.state;
+    const nextFocus = key;
+    const nextSelectedValue = suggestions[nextFocus];
+
+    const nextState = {
+      ...this.state,
+      currentFocus: nextFocus,
+      selectedValue: nextSelectedValue
+    };
+    this.setState(nextState);
+  };
+
   postData = (data = {}) =>
     // Default options are marked with *
     fetch(C.API_URL, {
@@ -95,13 +108,14 @@ class App extends React.Component {
       .catch(error => console.error(error));
 
   render() {
-    const { handleInputChange, handleKeyDown } = this;
+    const { handleInputChange, handleKeyDown, handleClick } = this;
     const { suggestions, currentFocus, selectedValue } = this.state;
     return (
       <div className="app">
         <FormContainer
           handleInputChange={handleInputChange}
           handleKeyDown={handleKeyDown}
+          handleClick={handleClick}
           suggestions={suggestions}
           currentFocus={currentFocus}
           query={selectedValue}
